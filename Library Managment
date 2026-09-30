@@ -1,0 +1,275 @@
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <string>
+using namespace std;
+
+struct Book
+{
+    int id;
+    string title;
+    string author;
+    bool available;
+};
+
+vector<Book> books;
+
+// ================= Add Book =================
+void addBook()
+{
+    Book book;
+
+    cout << "\nEnter Book ID: ";
+    cin >> book.id;
+    cin.ignore();
+
+    cout << "Enter Book Title: ";
+    getline(cin, book.title);
+
+    cout << "Enter Author Name: ";
+    getline(cin, book.author);
+
+    book.available = true;
+
+    books.push_back(book);
+
+    cout << "\nBook added successfully!\n";
+}
+
+// ================= Show Books =================
+void showBooks()
+{
+    if (books.empty())
+    {
+        cout << "\nNo books available.\n";
+        return;
+    }
+
+    cout << "\n========== Library Books ==========\n";
+
+    for (const Book& book : books)
+    {
+        cout << "ID: " << book.id << endl;
+        cout << "Title: " << book.title << endl;
+        cout << "Author: " << book.author << endl;
+        cout << "Status: "
+             << (book.available ? "Available" : "Borrowed")
+             << endl;
+
+        cout << "----------------------------------\n";
+    }
+}
+
+// ================= Search Book =================
+void searchBook()
+{
+    int id;
+
+    cout << "\nEnter Book ID to search: ";
+    cin >> id;
+
+    for (const Book& book : books)
+    {
+        if (book.id == id)
+        {
+            cout << "\nBook Found!\n";
+            cout << "ID: " << book.id << endl;
+            cout << "Title: " << book.title << endl;
+            cout << "Author: " << book.author << endl;
+            cout << "Status: "
+                 << (book.available ? "Available" : "Borrowed")
+                 << endl;
+
+            return;
+        }
+    }
+
+    cout << "\nBook not found.\n";
+}
+
+// ================= Delete Book =================
+void deleteBook()
+{
+    int id;
+
+    cout << "\nEnter Book ID to delete: ";
+    cin >> id;
+
+    for (auto it = books.begin(); it != books.end(); ++it)
+    {
+        if (it->id == id)
+        {
+            books.erase(it);
+
+            cout << "\nBook deleted successfully!\n";
+            return;
+        }
+    }
+
+    cout << "\nBook not found.\n";
+}
+
+// ================= Borrow Book =================
+void borrowBook()
+{
+    int id;
+
+    cout << "\nEnter Book ID to borrow: ";
+    cin >> id;
+
+    for (Book& book : books)
+    {
+        if (book.id == id)
+        {
+            if (book.available)
+            {
+                book.available = false;
+                cout << "\nBook borrowed successfully!\n";
+            }
+            else
+            {
+                cout << "\nBook is already borrowed.\n";
+            }
+
+            return;
+        }
+    }
+
+    cout << "\nBook not found.\n";
+}
+
+// ================= Return Book =================
+void returnBook()
+{
+    int id;
+
+    cout << "\nEnter Book ID to return: ";
+    cin >> id;
+
+    for (Book& book : books)
+    {
+        if (book.id == id)
+        {
+            if (!book.available)
+            {
+                book.available = true;
+                cout << "\nBook returned successfully!\n";
+            }
+            else
+            {
+                cout << "\nThis book is already available.\n";
+            }
+
+            return;
+        }
+    }
+
+    cout << "\nBook not found.\n";
+}
+
+// ================= Save Books =================
+void saveBooks()
+{
+    ofstream file("books.txt");
+
+    for (const Book& book : books)
+    {
+        file << book.id << endl;
+        file << book.title << endl;
+        file << book.author << endl;
+        file << book.available << endl;
+    }
+
+    file.close();
+}
+
+// ================= Load Books =================
+void loadBooks()
+{
+    ifstream file("books.txt");
+
+    if (!file)
+        return;
+
+    Book book;
+
+    while (file >> book.id)
+    {
+        file.ignore();
+
+        getline(file, book.title);
+        getline(file, book.author);
+
+        file >> book.available;
+
+        books.push_back(book);
+    }
+
+    file.close();
+}
+
+// ================= Main =================
+int main()
+{
+    loadBooks();
+
+    int choice;
+
+    do
+    {
+        cout << "\n\n";
+        cout << "====================================\n";
+        cout << "       LIBRARY MANAGEMENT SYSTEM\n";
+        cout << "====================================\n";
+
+        cout << "1. Add Book\n";
+        cout << "2. Show All Books\n";
+        cout << "3. Search Book\n";
+        cout << "4. Delete Book\n";
+        cout << "5. Borrow Book\n";
+        cout << "6. Return Book\n";
+        cout << "7. Exit\n";
+
+        cout << "====================================\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice)
+        {
+        case 1:
+            addBook();
+            break;
+
+        case 2:
+            showBooks();
+            break;
+
+        case 3:
+            searchBook();
+            break;
+
+        case 4:
+            deleteBook();
+            break;
+
+        case 5:
+            borrowBook();
+            break;
+
+        case 6:
+            returnBook();
+            break;
+
+        case 7:
+            saveBooks();
+            cout << "\nData saved. Goodbye!\n";
+            break;
+
+        default:
+            cout << "\nInvalid choice!\n";
+        }
+
+    } while (choice != 7);
+
+    return 0;
+}
